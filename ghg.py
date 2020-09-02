@@ -112,7 +112,7 @@ class GHGPredictor():
             - Cini nam se da je ovo prirodno djubrivo + ostale "izlucevine" zivotinja
 
         '''
-        NEX = organic_n2o # Po pretpostavci iz komentara
+        NEX = 0 # Po pretpostavci iz komentara
 
         return (synth_n2o + NEX ) * self.FRAC_LEACH * self.LEACHING_RUNOFF_EMISSIONS
         
