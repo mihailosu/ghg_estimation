@@ -52,6 +52,7 @@ class GHGPredictor():
         diesel_energy_content_per_litre = 36292.24
         # Sad je mmBtu/litre
         diesel_energy_content_per_litre = diesel_energy_content_per_litre / 1000000
+        
         co2_combustion_factor = 3166.4
         ch4_combustion_factor = 0.4466
         n2o_combustion_factor = 0.0806 
