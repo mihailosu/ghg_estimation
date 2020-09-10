@@ -15,9 +15,9 @@ class GHGPredictor():
         self.EF_DOLOMITE = 0.13
         self.FRAC_GASF = 0.1
         self.FRAC_GASM = 0.2
-        self.fuelEFC = 15443.41
-        self.fuelEFM = 104.52
-        self.fuelEFN = 0.25
+        self.fuelEFC = 15443.41 # MMBTU
+        self.fuelEFM = 104.52   # MMBTU
+        self.fuelEFN = 0.25     # MMBTU
         self.FRAC_LEACH = 0.3 # Default value (range: 0.1 - 0.8)
         self.LEACHING_RUNOFF_EMISSIONS = 0.025 # Default value (range: 0.002 - 0.12)
 
@@ -47,7 +47,11 @@ class GHGPredictor():
         Returns:
               - Amount of CO2 equivalent ghg emissions (in entered units)
         '''
+        # TODO: mmBTU to BTU? 1 : 1 000 000 ??? Da li je mmBTU isto sto i MMBTU
+        # OVO JE  Btu/litre
         diesel_energy_content_per_litre = 36292.24
+        # Sad je mmBtu/litre
+        diesel_energy_content_per_litre = diesel_energy_content_per_litre / 1000000
         co2_combustion_factor = 3166.4
         ch4_combustion_factor = 0.4466
         n2o_combustion_factor = 0.0806 
