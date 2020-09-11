@@ -3,7 +3,7 @@ import pandas as pd
 from ghg import GHGPredictor
 
 # Diesel consumption for tilling in Germany?
-TRACTOR_DIESEL_PER_HECTARE = 0
+TRACTOR_DIESEL_PER_HECTARE = 70
 
 predictor = GHGPredictor()
 

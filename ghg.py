@@ -24,7 +24,7 @@ class GHGPredictor():
         # Liters per hectar of pesticides
         
     '''Diesel fuel only'''
-    def fuel_ghg_emissions(self, fuel_liters, unit = "g"):
+    def fuel_ghg_emissions(self, fuel_liters, unit = "g", num_days = 5):
         '''
         Calculates the emisson produced by fuel consumption in CO2 equivalent value.
         Based on furmulae in paper:
@@ -60,7 +60,7 @@ class GHGPredictor():
         co2 = (self.fuelEFC * diesel_energy_content_per_litre + co2_combustion_factor) * fuel_liters * 0.001
         ch4 = (self.fuelEFM * diesel_energy_content_per_litre + ch4_combustion_factor) * fuel_liters * 0.001
         n2o = (self.fuelEFN * diesel_energy_content_per_litre + n2o_combustion_factor) * fuel_liters * 0.001
-        out = co2 * self.GWP_C + ch4 * self.GWP_M + n2o * self.GWP_N
+        out = (co2 * self.GWP_C + ch4 * self.GWP_M + n2o * self.GWP_N) * num_days
         if unit == "g":
               return out
         elif unit == "kg":
