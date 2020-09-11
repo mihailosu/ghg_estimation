@@ -50,7 +50,7 @@ class GHGPredictor():
         # TODO: mmBTU to BTU? 1 : 1 000 000 ??? Da li je mmBTU isto sto i MMBTU
         # OVO JE  Btu/litre
         diesel_energy_content_per_litre = 36292.24
-        # Sad je mmBtu/litre
+        # Sad je mmBtu/litre (miliona Btu po litri)
         diesel_energy_content_per_litre = diesel_energy_content_per_litre / 1000000
         
         co2_combustion_factor = 3166.4
