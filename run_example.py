@@ -10,8 +10,9 @@ predictor = GHGPredictor()
 df = pd.read_csv("db.min.csv", index_col=0)
 
 def calculate_emissions(df):
-    fuel_litres = df["Area"] * TRACTOR_DIESEL_PER_HECTARE
-    fuel_ghg = predictor.fuel_ghg_emissions(fuel_litres, unit="kg")
+    # fuel_litres = df["Area"] * TRACTOR_DIESEL_PER_HECTARE
+
+    fuel_ghg = predictor.fuel_ghg_emissions(df["Area"], unit="kg")
 
     ms_ghg = predictor.managed_soils_ghg(df["N"], df["Manure"], df["Area"])
 
