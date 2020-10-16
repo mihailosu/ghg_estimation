@@ -1,4 +1,4 @@
-
+import pandas as pd
 
 class GHGPredictor():
 
@@ -46,6 +46,9 @@ class GHGPredictor():
                   fuel_liters = 163
             else:
                   fuel_liters = 94 # Fallback to wheat
+
+            # print(crop_type)
+            # print(fuel_liters)
 
             fuel_liters = fuel_liters * area
 
@@ -102,7 +105,7 @@ class GHGPredictor():
                   print("Invalid unit parameter. Choose from \{ 'g', 'kg', 't' \}")
             
 
-      def managed_soils_ghg(self, synth_n2o, organic_n2o, field_area, residue_n2o = 0):
+      def managed_soils_ghg(self, synth_n2o, organic_n2o, field_area, crop_type, yields):
             '''
             Calculating CO2 equivalent emmisions from various practices and natural soil content.
             Based on furmulae in paper:
@@ -129,8 +132,9 @@ class GHGPredictor():
                   - field_area:  Area of managed field
 
             '''
-            # TODO: Residue needs to be specified. How?
-            n2o_inputs = (synth_n2o + organic_n2o + residue_n2o) * self.EF_INPUTS_Z
+            #residue_n2o = 0
+            residue_n2o = pd.concat([crop_type,field_area,yields], axis = 1).apply(lambda x: self.crop_residue_emissions(x[0],x[1],x[2]), axis = 1)
+            n2o_inputs = (synth_n2o * field_area + organic_n2o * field_area + residue_n2o) * self.EF_INPUTS_Z
             n2o_organic_soils = field_area * self.EF_ORGSOILS_Z
             direct_n2o = (n2o_inputs + n2o_organic_soils) * self.N2O_FACTOR
 
@@ -163,3 +167,58 @@ class GHGPredictor():
                         Improvement, 30:4, 447-477, DOI: 10.1080/15427528.2016.1174180
             '''
             pass
+      
+      def crop_residue_emissions(self, crop_type, area, yields, factor_table = "crop_residue_factors.csv"):
+            '''
+            Function that estimates amount of GHG emissions from leftover crop residue on the field.
+            
+            Args:
+                  - crop_type: name of the crop that was planted on the field (e.g. "Maize").
+                  - area: area of the field in question. 
+                  - yields: amount of crops produced on the farm.
+                  - factor_table: name of the .csv file from which factors for different crops are loaded.
+                  
+            Returns:
+                  - Amount of GHG produced from the estimated amount of residue from given crop on a 
+                  given field. If factors for crop in question are not available in the IPCC source 
+                  material, returns 0.
+            
+            Source:
+                  https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf
+            
+            Notes on the factor table:
+                  - numbers have been taken from 
+                  https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/4_Volume4/V4_11_Ch11_N2O&CO2.pdf
+                  - for the "2nd" crop that appeares in original dataset (e.g. 2nd soybean), same numbers
+                  have been used as in the "1st" case
+                  - summer barley and sweet corn factors were not available, so we used factors for
+                  barley and maize, respectively
+                  - table in the source paper consists of factors for specific crops as well as factors
+                  for broader group of crops (e.g. grains, root crops, etc.). If specific crop factors
+                  were not available, factors for the broader plant group were used (e.g. numbers were 
+                  not available for oilseed rape, so the numbers for this plant in the table are 
+                  actually numbers for "root crops" in the source material). 
+                  - if no factors were available in the source material for a specific plant or a broader
+                  group that plant belongs, residue cannot be calculated.
+            '''
+            factors = pd.read_csv(factor_table, index_col = 0)
+            
+            if crop_type in factors.index:
+                  dry = factors.loc[crop_type,"DRY"]
+                  slope = factors.loc[crop_type,"Slope"]
+                  intersept = factors.loc[crop_type,"intersept"]
+                  N_ag = factors.loc[crop_type,"N_ag"]
+                  N_bg = factors.loc[crop_type,"N_bg"]
+                  R_bgbio = factors.loc[crop_type,"R_bgbio"]
+                  
+                  crop = yields *1000 *dry
+                  AG = (crop/1000)*slope + intersept
+                  
+                  return area*(AG*1000*N_ag + (AG*1000+crop)*R_bgbio*N_bg)
+            
+            else:
+                  return 0
+            
+            
+            
+      
