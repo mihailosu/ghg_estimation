@@ -55,7 +55,7 @@ res = zip(y_pred, Y_test)
 ghg_predictor = GHGPredictor()
 
 def predict(model, row):
-    preds = {}
+    preds = []
     # print(row)
     # print(row.).shape)
     for perc in range(-10, 11):
@@ -102,8 +102,11 @@ def predict(model, row):
         # GHG
         # fuel = ghg_predictor.fuel_ghg_emissions()
 
+        preds.append([nitrogen, pred[0], sum_ghg])
 
         print('{:4}% | Yield: {:.2f} | Area {} | C02_ha {:.5f} | C02 {:.5f}'.format(100 + perc, pred[0], area, sum_ghg / area, sum_ghg))
+
+    return preds
 
 # accuracy = accuracy_score(Y_test, predictions)
 # print("Accuracy: %.2f%%" % (accuracy * 100.0))
@@ -117,4 +120,33 @@ while rand_row['N'] == 0:
     rand_row = dataset_df.iloc[rand_ind]
 # rand_row = rand_row[:-1]
 
-predict(model, rand_row)
+preds = predict(model, rand_row)
+
+import matplotlib.pyplot as plt
+
+fig, ax1 = plt.subplots()
+
+n_amount = [x[0] for x in preds]
+yield_p = [x[1] for x in preds]
+ghg_p = [x[2] for x in preds]
+
+color = 'tab:red'
+ax1.set_xlabel('N')
+ax1.set_ylabel('Yield (t)', color=color)
+ax1.set_title(f'GHG and yield predictions (Area: {rand_row["Area"]} ha)')
+ax1.plot(n_amount, yield_p, color=color)
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+color = 'tab:blue'
+ax2.set_ylabel('CO2 (kg)', color=color)  # we already handled the x-label with ax1
+ax2.plot(n_amount, ghg_p, color=color)
+ax2.tick_params(axis='y', labelcolor=color)
+
+print(n_amount)
+
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+plt.show()
+
+
